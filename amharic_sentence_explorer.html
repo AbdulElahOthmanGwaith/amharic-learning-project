@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔤 الباحث في الجمل الأمهرية - Amharic Sentence Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #059669;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', 'Inter', 'Noto Sans Ethiopic', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .flags {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .search-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.25rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: var(--background);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .filter-wrapper {
+            position: relative;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 1rem 2.5rem 1rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--background);
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .stat-item strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            padding: 0.5rem 1rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        .results-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: calc(100vh - 350px);
+            min-height: 400px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+        }
+
+        .data-table th:hover {
+            background: var(--primary-dark);
+        }
+
+        .data-table th .sort-icon {
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .data-table th.sorted .sort-icon {
+            opacity: 1;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .data-table tbody tr:nth-child(even):hover {
+            background: #f1f5f9;
+        }
+
+        .col-number {
+            width: 60px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .col-category {
+            width: 120px;
+            white-space: nowrap;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #e0e7ff;
+            color: #3730a3;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .col-arabic {
+            width: 22%;
+            font-weight: 500;
+        }
+
+        .col-english {
+            width: 18%;
+            color: var(--text-light);
+        }
+
+        .col-pronunciation {
+            width: 18%;
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .col-amharic {
+            width: 20%;
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            font-size: 1.1rem;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .no-results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .no-results p {
+            color: var(--text-light);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            padding: 0 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            margin-top: 1rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .col-arabic, .col-english, .col-pronunciation {
+                width: auto;
+            }
+
+            .col-amharic {
+                width: 150px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .search-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .data-table {
+                font-size: 0.85rem;
+            }
+
+            .data-table th, .data-table td {
+                padding: 0.625rem 0.5rem;
+            }
+
+            .col-category {
+                width: 100px;
+            }
+
+            .category-badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .table-container {
+                max-height: calc(100vh - 400px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                gap: 1rem;
+            }
+
+            .stat-item {
+                font-size: 0.8rem;
+            }
+
+            .pagination {
+                gap: 0.25rem;
+            }
+
+            .page-btn {
+                min-width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* Highlight matching text */
+        .highlight {
+            background: #fef08a;
+            padding: 0.125rem 0.25rem;
+            border-radius: 4px;
+        }
+
+        /* Copy button */
+        .copy-btn {
+            padding: 0.25rem 0.5rem;
+            background: var(--border);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .data-table td:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .copy-btn.copied {
+            background: var(--secondary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🔤 الباحث في الجمل الأمهرية</h1>
+        <p>البحث السريع في أكثر من 5,000 جملة بثلاث لغات</p>
+        <div class="flags">
+            <span>🇸🇦 العربية</span>
+            <span>🇬🇧 English</span>
+            <span>🇪🇹 አማርኛ</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="search-section">
+            <div class="search-controls">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput" placeholder="ابحث بأي لغة... (عربي، إنجليزي، أمهري)">
+                </div>
+                <div class="filter-wrapper">
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="">📁 جميع الفئات</option>
+                    </select>
+                    <span class="filter-icon">▼</span>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span>إجمالي: <strong id="totalCount">0</strong></span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🔍</span>
+                        <span>النتائج: <strong id="resultCount">0</strong></span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📁</span>
+                        <span>الفئات: <strong id="categoryCount">0</strong></span>
+                    </div>
+                </div>
+                <button class="clear-btn" id="clearBtn">🗑️ مسح البحث</button>
+            </div>
+        </section>
+
+        <section class="results-section">
+            <div class="table-container">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="id" class="sorted"># <span class="sort-icon">↑↓</span></th>
+                            <th data-sort="category">الفئة <span class="sort-icon">↑↓</span></th>
+                            <th data-sort="arabic">العربية <span class="sort-icon">↑↓</span></th>
+                            <th data-sort="english">English <span class="sort-icon">↑↓</span></th>
+                            <th data-sort="pronunciation">النطق <span class="sort-icon">↑↓</span></th>
+                            <th data-sort="amharic">አማርኛ <span class="sort-icon">↑↓</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <div class="spinner"></div>
+                                <p>جاري تحميل البيانات...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevBtn" disabled>« السابق</button>
+                <span class="page-info" id="pageInfo">صفحة 1 من 1</span>
+                <button class="page-btn" id="nextBtn" disabled>التالي »</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global state
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const rowsPerPage = 50;
+        let currentSort = { column: 'id', direction: 'asc' };
+        let searchTimeout = null;
+
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const tableBody = document.getElementById('tableBody');
+        const pagination = document.getElementById('pagination');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const totalCount = document.getElementById('totalCount');
+        const resultCount = document.getElementById('resultCount');
+        const categoryCount = document.getElementById('categoryCount');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Initialize
+        async function init() {
+            try {
+                const response = await fetch('sentences_data.json');
+                allData = await response.json();
+                
+                populateCategories();
+                setupEventListeners();
+                applyFilters();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-results">
+                            <div class="no-results-icon">❌</div>
+                            <h3>خطأ في تحميل البيانات</h3>
+                            <p>يرجى التأكد من وجود ملف sentences_data.json</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function populateCategories() {
+            const categories = [...new Set(allData.map(item => item.category))].sort();
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+            categoryCount.textContent = categories.length;
+        }
+
+        function setupEventListeners() {
+            // Search with debounce
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    applyFilters();
+                }, 300);
+            });
+
+            // Category filter
+            categoryFilter.addEventListener('change', () => {
+                currentPage = 1;
+                applyFilters();
+            });
+
+            // Sort on column headers
+            document.querySelectorAll('.data-table th[data-sort]').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'asc';
+                    }
+                    updateSortIndicators();
+                    applyFilters();
+                });
+            });
+
+            // Pagination
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                }
+            });
+
+            // Clear button
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                categoryFilter.value = '';
+                currentPage = 1;
+                applyFilters();
+            });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (th.dataset.sort === currentSort.column) {
+                    th.classList.add('sorted');
+                    icon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+                } else {
+                    icon.textContent = '↑↓';
+                }
+            });
+        }
+
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter.value;
+
+            filteredData = allData.filter(item => {
+                // Category filter
+                if (category && item.category !== category) return false;
+
+                // Search filter
+                if (searchTerm) {
+                    const matches = (
+                        item.arabic.toLowerCase().includes(searchTerm) ||
+                        item.english.toLowerCase().includes(searchTerm) ||
+                        item.amharic.toLowerCase().includes(searchTerm) ||
+                        item.pronunciation.toLowerCase().includes(searchTerm) ||
+                        item.id.includes(searchTerm)
+                    );
+                    if (!matches) return false;
+                }
+
+                return true;
+            });
+
+            // Apply sorting
+            filteredData.sort((a, b) => {
+                let valA = a[currentSort.column];
+                let valB = b[currentSort.column];
+
+                if (currentSort.column === 'id') {
+                    valA = parseInt(valA);
+                    valB = parseInt(valB);
+                } else {
+                    valA = valA || '';
+                    valB = valB || '';
+                    valA = valA.toString().toLowerCase();
+                    valB = valB.toString().toLowerCase();
+                }
+
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            totalCount.textContent = allData.length;
+            resultCount.textContent = filteredData.length;
+            updatePagination();
+            renderTable();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            pageInfo.textContent = `صفحة ${currentPage} من ${totalPages || 1}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        function renderTable() {
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-results">
+                            <div class="no-results-icon">🔍</div>
+                            <h3>لا توجد نتائج</h3>
+                            <p>جرب البحث بكلمات أخرى أو تصفية الفئة</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+
+            tableBody.innerHTML = pageData.map((item, index) => `
+                <tr>
+                    <td class="col-number">${item.id}</td>
+                    <td class="col-category">
+                        <span class="category-badge">${highlightMatch(item.category, searchTerm)}</span>
+                    </td>
+                    <td class="col-arabic">
+                        <button class="copy-btn" onclick="copyText(this, '${escapeHtml(item.arabic)}')">📋</button>
+                        ${highlightMatch(item.arabic, searchTerm)}
+                    </td>
+                    <td class="col-english">
+                        ${item.english ? highlightMatch(item.english, searchTerm) : '-'}
+                    </td>
+                    <td class="col-pronunciation">
+                        ${item.pronunciation ? highlightMatch(item.pronunciation, searchTerm) : '-'}
+                    </td>
+                    <td class="col-amharic">
+                        ${item.amharic ? highlightMatch(item.amharic, searchTerm) : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function highlightMatch(text, searchTerm) {
+            if (!searchTerm || !text) return text || '-';
+            const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function copyText(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '✓';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = '📋';
+                    button.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
